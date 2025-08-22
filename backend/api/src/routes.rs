@@ -1,7 +1,8 @@
 use actix_web::web;
+use actix_web::web::scope;
 use actix_web_httpauth::middleware::HttpAuthentication;
 
-use crate::handlers::auth_handler::authenticate_user;
+use crate::handlers::auth::config as AuthConfig;
 use crate::handlers::title_group_handler::edit_title_group;
 use crate::handlers::torrent_request_handler::search_torrent_requests;
 use crate::handlers::user_handler::add_api_key;
@@ -12,7 +13,6 @@ use crate::handlers::{
         add_affiliated_artists, add_artists, get_artist_publications, get_artists_lite,
         remove_affiliated_artists,
     },
-    auth_handler::{login, refresh_token, register},
     conversation_handler::{
         add_conversation, add_conversation_message, get_conversation, get_user_conversations,
     },
@@ -48,13 +48,13 @@ use crate::handlers::{
     user_handler::{edit_user, get_me, get_user, warn_user},
     wiki_handler::{add_wiki_article, get_wiki_article},
 };
+use crate::middlewares::jwt_middleware::authenticate_user;
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(handle_announce).service(
         web::scope("/api")
             .wrap(HttpAuthentication::with_fn(authenticate_user))
-            .route("/register", web::post().to(register))
-            .route("/login", web::post().to(login))
+            .service(scope("/auth").configure(AuthConfig))
             .route("/apply", web::post().to(add_user_application))
             .route("/api-key", web::post().to(add_api_key))
             .route("/user-application", web::get().to(get_user_applications))
@@ -62,7 +62,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
                 "/user-application",
                 web::put().to(update_user_application_status),
             )
-            .route("/refresh-token", web::post().to(refresh_token))
+            // .route("/refresh-token", web::post().to(refresh_token))
             .route("/home", web::get().to(get_home))
             .route("/user", web::get().to(get_user))
             .route("/user", web::put().to(edit_user))

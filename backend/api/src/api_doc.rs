@@ -2,7 +2,7 @@ use utoipa::OpenApi;
 
 use crate::handlers::{
     artist_handler::GetArtistPublicationsQuery,
-    auth_handler::RegisterQuery,
+    auth::register::RegisterQuery,
     home_handler::HomePage,
     scrapers::ExternalDBData,
     torrent_handler::{DownloadTorrentQuery, GetTopTorrentsQuery, UploadInformation},
@@ -53,12 +53,12 @@ use arcadia_storage::models::{
 #[openapi(
     info(title = "arcadia-backend API",),
     paths(
-        crate::handlers::auth_handler::register,
-        crate::handlers::auth_handler::login,
+        crate::handlers::auth::register::exec,
+        crate::handlers::auth::login::exec,
+        crate::handlers::auth::refresh_token::exec,
         crate::handlers::user_application_handler::add_user_application,
         crate::handlers::user_application_handler::get_user_applications,
         crate::handlers::user_application_handler::update_user_application_status,
-        crate::handlers::auth_handler::refresh_token,
         crate::handlers::home_handler::get_home,
         crate::handlers::artist_handler::get_artist_publications,
         crate::handlers::artist_handler::add_artists,
